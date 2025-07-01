@@ -38,11 +38,11 @@ def main():
     ]
     
     for junction in junctions:
-        print(junction)
+        print(junction.y)
         #print("Длительность цикла", junction.full_cycle_seconds)
 
-    # plt = plot_time_space_diagram(junctions)
-    # plt.show()
+    plt = plot_time_space_diagram(junctions)
+    plt.show()
        
 
 if __name__ == "__main__":

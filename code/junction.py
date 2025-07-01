@@ -62,14 +62,17 @@ class Junction:
         self.full_cycle = _full_cycle
         self.full_cycle_seconds = sum([phase.total_seconds for phase in _full_cycle])
         self.cycle_offset_seconds = 0
+        self.x = _x
+        self.y = _y
+
     def set_offset(self, offset_seconds: int):
         self.cycle_offset_seconds = offset_seconds
     def get_offset(self) -> int:
         return self.cycle_offset_seconds
     def __str__(self):
-        return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_duration: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_duration)
+        return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_seconds: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_seconds)
     def __repr__(self):
-        return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_duration: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_duration)
+        return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_seconds: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_seconds)
     
     def get_green_intervals(self) -> List[GreenInterval]:
         ans = []
