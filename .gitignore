@@ -1,3 +1,5 @@
 work.synctex.gz
 work.aux
 work.log
+*.fls
+*.fdb_latexmk
