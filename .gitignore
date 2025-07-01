@@ -3,3 +3,4 @@ work.aux
 work.log
 *.fls
 *.fdb_latexmk
+__pycache__/
