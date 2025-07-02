@@ -1,12 +1,15 @@
 from junction import Junction, Phase, Signal, Color
+from draw import plot_time_space_diagram, plot_green_waves, plot_through_wave_bands
+from green_wave_finder import find_complete_green_waves
+
 def main():
     junctions = [
         Junction(
             0, "tls #0",
             0, 0,
             [
-                Phase(1, [Signal(30, Color.GREEN, 25, 35), Signal(20, Color.RED, 20, 20)]),
-                Phase(2, [Signal(20, Color.GREEN, 15, 25), Signal(15, Color.RED, 15, 15)])
+                Phase(0, [Signal(30, Color.GREEN, 25, 35), Signal(20, Color.RED, 20, 20)]),
+                Phase(1, [Signal(20, Color.GREEN, 15, 25), Signal(15, Color.RED, 15, 15)])
             ]
         ),
         Junction(
@@ -34,17 +37,26 @@ def main():
             ]
         )
     ]
+    
+    offsets = [0, 122, 0, 150]
+    for i, offset in enumerate(offsets):
+        print(f"Junction {i} offset: {offset}")
+        junctions[i].set_offset(offset)
 
     for junction in junctions:
+        print(junction)
+        print("Green intervals:", junction.get_green_intervals())
 
-        print(f"\nЗелёные интервалы для {junction.name} (ID: {junction.id}):")
-        green_intervals = junction.get_green_intervals()
-        for interval in green_intervals:
-            print(f"  Фаза {interval.phase_idx}: с {interval.start_seconds} по {interval.end_seconds} секунд")
-        #print("Длительность цикла", junction.full_cycle_seconds)
+    complete_green_waves = find_complete_green_waves(junctions, speed_kmh=40)
+    for wave in complete_green_waves.green_waves:
+        print("Complete green wave:", wave)
+    for through_wave in complete_green_waves.chained_green_waves:
+        print("Through green wave:", through_wave, "CRITERIA", through_wave.band_size)
 
-    # plt = plot_time_space_diagram(junctions)
-    # plt.show()
+    plt = plot_time_space_diagram(junctions)
+    plt = plot_green_waves(plt, junctions, complete_green_waves.green_waves)
+    plt = plot_through_wave_bands(plt, junctions, complete_green_waves.chained_green_waves)
+    plt.show()
 
 if __name__ == "__main__":
     main()
