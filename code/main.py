@@ -1,6 +1,4 @@
 from junction import Junction, Phase, Signal, Color
-from draw import plot_time_space_diagram
-
 def main():
     junctions = [
         Junction(
@@ -36,14 +34,17 @@ def main():
             ]
         )
     ]
-    
+
     for junction in junctions:
-        print(junction.y)
+
+        print(f"\nЗелёные интервалы для {junction.name} (ID: {junction.id}):")
+        green_intervals = junction.get_green_intervals()
+        for interval in green_intervals:
+            print(f"  Фаза {interval.phase_idx}: с {interval.start_seconds} по {interval.end_seconds} секунд")
         #print("Длительность цикла", junction.full_cycle_seconds)
 
-    plt = plot_time_space_diagram(junctions)
-    plt.show()
-       
+    # plt = plot_time_space_diagram(junctions)
+    # plt.show()
 
 if __name__ == "__main__":
     main()

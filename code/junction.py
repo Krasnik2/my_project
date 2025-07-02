@@ -1,5 +1,6 @@
 from enum import Enum
 from typing import List
+import numpy as np
 
 class Color(Enum):
     RED = "red"
@@ -8,7 +9,7 @@ class Color(Enum):
 
     def __str__(self):
         return self.value
-    
+
 class Signal:
     duration_seconds: int
     min_duration_seconds: int
@@ -46,10 +47,10 @@ class GreenInterval:
         self.start_seconds = start_seconds
         self.end_seconds = end_seconds
     def __str__(self):
-        return "GreenInterval{{phase_idx: {}, start: {}, end: {}}}".format(self.phase_idx, self.start, self.end)
+        return "GreenInterval{{phase_idx: {}, start_seconds: {}, end_seconds: {}}}".format(self.phase_idx, self.start, self.end)
     def __repr__(self):
-        return "GreenInterval{{phase_idx: {}, start: {}, end: {}}}".format(self.phase_idx, self.start, self.end)
-    
+        return "GreenInterval{{phase_idx: {}, start_seconds: {}, end_seconds: {}}}".format(self.phase_idx, self.start, self.end)
+
 class Junction:
     id: int
     name: str
@@ -73,13 +74,21 @@ class Junction:
         return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_seconds: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_seconds)
     def __repr__(self):
         return "Junction{{id: {}, name: {}, x: {}, y: {}, full_cycle_seconds: {}}}".format(self.id, self.name, self.x, self.y, self.full_cycle_seconds)
-    
+
     def get_green_intervals(self) -> List[GreenInterval]:
-        ans = []
-        #
-        # Реализовать поиск зеленых интервалов для светофора
-        #
-        return ans
+        intervals = []
+        current_time = self.cycle_offset_seconds
+        for phase in self.full_cycle:
+            signal_start = current_time
+            for signal in phase.signals:
+                if signal.color == Color.GREEN:
+                    start = signal_start
+                    end = start + signal.duration_seconds
+                    intervals.append(GreenInterval(phase.id, start, end))
+                signal_start += signal.duration_seconds
+            current_time += phase.total_seconds
+        return intervals
+
 
     def get_signal_at(self, time: int) -> Signal:
         # Возвращает сигнал, который будет активен в заданный момент времени.
