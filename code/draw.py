@@ -5,81 +5,80 @@ from green_wave import GreenWave, ThroughGreenWave
 
 dpi = 150
 plt.rcParams['figure.dpi'] = dpi  
-plt.rcParams["figure.figsize"] = (12, 9) # Дюймы
+plt.rcParams["figure.figsize"] = (10, 6) # Дюймы
 plt.ioff()
 
+
 def plot_time_space_diagram(junctions: List[Junction]):
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig, ax = plt.subplots()
+    rect_height = 20  # Высота прямоугольников
+    y_coords = [j.y for j in junctions]
+    max_y = max(y_coords)
+    min_y = min(y_coords)
+    cycle_length = max(j.full_cycle_seconds for j in junctions)
 
-    # Цикл по светофорам
     for junction in junctions:
-        # Отрисовка светофоров
-        ax.scatter(
-            # 0X
-            0,
-            # 0Y
-            junction.y,
-            # Размер кружочка
-            s=100,
-            # Вид
-            marker="o",
-            # Цвет заливки, HEX
-            facecolors=("#D8BFD8"),
-            # Цвет контура, HEX
-            edgecolors=("#4B0082"),
-        )
-        # Подпись светофоров
+        y_center = junction.y
+        y_bottom = y_center - rect_height / 2
+        current_time = junction.cycle_offset_seconds % cycle_length
+
+        # Отрисовываем сигналы с учетом смещения
+        for phase in junction.full_cycle:
+            for signal in phase.signals:
+                start_time = current_time % cycle_length
+                end_time = (start_time + signal.duration_seconds) % cycle_length
+
+                if end_time > start_time:
+                    # Прямоугольник не пересекает границу цикла
+                    ax.add_patch(plt.Rectangle(
+                        (start_time, y_bottom),
+                        width=signal.duration_seconds,
+                        height=rect_height,
+                        facecolor=str(signal.color),
+                        edgecolor='black',
+                        linewidth=0.5
+                    ))
+                else:
+                    # Прямоугольник пересекает границу цикла
+                    ax.add_patch(plt.Rectangle(
+                        (start_time, y_bottom),
+                        width=cycle_length - start_time,
+                        height=rect_height,
+                        facecolor=str(signal.color),
+                        edgecolor='black',
+                        linewidth=0.5
+                    ))
+                    ax.add_patch(plt.Rectangle(
+                        (0, y_bottom),
+                        width=end_time,
+                        height=rect_height,
+                        facecolor=str(signal.color),
+                        edgecolor='black',
+                        linewidth=0.5
+                    ))
+
+                current_time += signal.duration_seconds
+
+    # Настройки осей и оформления
+    ax.set_xlim(0, cycle_length)
+    ax.set_ylim(min_y - rect_height, max_y + rect_height)
+    ax.set_xlabel("t, секунды", fontsize=12, fontweight='bold')
+    ax.set_ylabel("Светофорные объекты, метры", fontsize=12, fontweight='bold')
+
+    # Подписи светофоров
+    for junction in junctions:
         ax.text(
-            0,
-            junction.y + 40,
-            f"{junction.name}",
-            va="center",
-            ha="center",
-            fontsize=8,
-            fontweight="bold",
+            0.05 * cycle_length,  # отступ
+            junction.y,
+            junction.name,
+            ha='right',
+            va='center',
+            fontsize=10
         )
 
-        # Отрисовка лент времени
-        # Сдвиг ленты 0X
-        prev_cycle_x = junction.get_offset()
-        # Сдвиг ленты 0Y - позиция светофора в нашем случае
-        prev_cycle_y = junction.y
-        # Цикл по фазам
-        for phases in junction.full_cycle:
-            # Цикл по сигналам
-            for signal in phases.signals:
-                # Ищем границы интервалов цветов x (зеленый, желтый, красный)
-                # Длительность не должна превышать суммарную длительность светофорного цикла
-                x_start = prev_cycle_x % junction.full_cycle_seconds
-                x_end = (
-                    prev_cycle_x + signal.duration_seconds
-                ) % junction.full_cycle_seconds
-                # Случай, когда x_end < x_start
-                if x_end < x_start:
-                    # Рисуем первую часть от начала сигнала до конца цикла
-                    ax.plot(
-                        [x_start, junction.full_cycle_seconds],
-                        [prev_cycle_y, prev_cycle_y],
-                        color=f"{signal.color}",
-                        linewidth=2.5,
-                    )
-                    # Рисуем вторую часть от 0 до конца сигнала
-                    ax.plot(
-                        [0, x_end],
-                        [prev_cycle_y, prev_cycle_y],
-                        color=f"{signal.color}",
-                        linewidth=2.5,
-                    )
-                # Случай, когда x_end > x_start
-                else:
-                    ax.plot(
-                        [x_start, x_end],
-                        [prev_cycle_y, prev_cycle_y],
-                        color=f"{signal.color}",
-                        linewidth=2.5,
-                    )
-                # Переопределяем начало отрисовки следующего сигнала светофора
-                prev_cycle_x += signal.duration_seconds
+    ax.grid(True, axis='x', linestyle='--', alpha=0.7)
+    ax.grid(True, axis='y', linestyle=':', alpha=0.5)
+    plt.tight_layout()
     return plt
 
 def plot_green_waves(plt: plt, junctions: List[Junction], green_waves: list[list[GreenWave]]) -> plt:
