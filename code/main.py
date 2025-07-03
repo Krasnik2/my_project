@@ -41,8 +41,8 @@ def main():
 
 
 
-    offsets = best_offsets(junctions)
-    #offsets = [0,78,76,5]
+    #offsets = best_offsets(junctions)
+    offsets = [0,78,76,3]
 
     for i, offset in enumerate(offsets):
         print(f"Junction {i} offset: {offset}")
