@@ -1,6 +1,7 @@
 from junction import Junction, Phase, Signal, Color
 from draw import plot_time_space_diagram, plot_green_waves, plot_through_wave_bands
 from green_wave_finder import find_complete_green_waves
+from best_offsets import  best_offsets
 
 def main():
     junctions = [
@@ -37,19 +38,16 @@ def main():
             ]
         )
     ]
-    
-    offsets = [0, 122, 0, 150]
+
+
+
+    offsets = best_offsets(junctions)
+    #offsets = [0,78,76,5]
+
     for i, offset in enumerate(offsets):
         print(f"Junction {i} offset: {offset}")
         junctions[i].set_offset(offset)
-
-    for junction in junctions:
-        print(junction)
-        print("Green intervals:", junction.get_green_intervals())
-
     complete_green_waves = find_complete_green_waves(junctions, speed_kmh=40)
-    for wave in complete_green_waves.green_waves:
-        print("Complete green wave:", wave)
     for through_wave in complete_green_waves.chained_green_waves:
         print("Through green wave:", through_wave, "CRITERIA", through_wave.band_size)
 
