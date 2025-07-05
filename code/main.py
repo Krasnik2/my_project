@@ -40,22 +40,23 @@ def main():
     ]
 
 
-    # print(best_duration_signal_and_offsets(junctions))
+
     # junctions[0].full_cycle[0].signals[0].duration_seconds = 35
     # junctions[0].full_cycle[1].signals[0].duration_seconds = 15
     # junctions[1].full_cycle[0].signals[1].duration_seconds = 40
     # junctions[1].full_cycle[1].signals[1].duration_seconds = 5
     # offsets = [0,78,76,2]
-    #offsets = [0, -10, -8, 3]
-    offsets, max_band_size = best_offsets(junctions, [0, 85], [0, 0, 0, 0])
-
+    # offsets = [0, 74, 77, 3]
+    #print(best_duration_signal_and_offsets(junctions))
+    #offsets, max_band_size = best_offsets(junctions, [0, 85], [0, 0, 0, 0])
+    offsets = [0, 0, 0, 0]
     for i, offset in enumerate(offsets):
         print(f"Junction {i} offset: {offset}")
         junctions[i].set_offset(offset)
     complete_green_waves = find_complete_green_waves(junctions, speed_kmh=40)
     for through_wave in complete_green_waves.chained_green_waves:
         print("Through green wave:", through_wave, "CRITERIA", through_wave.band_size)
-    print("max_band_size",max_band_size)
+    # print("max_band_size",max_band_size)
 
     plt = plot_time_space_diagram(junctions)
     plt = plot_green_waves(plt, junctions, complete_green_waves.green_waves)

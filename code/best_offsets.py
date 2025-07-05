@@ -8,7 +8,7 @@ def best_offsets (junctions: List[Junction], range_offset: List[int], start_offs
     for j in range(range_offset[0], range_offset[1]):
         for k in range(range_offset[0], range_offset[1]):
             for z in range(range_offset[0], range_offset[1]):
-                offsets = [0, j, k, z]
+                offsets = [0, start_offset[1]+j, start_offset[2]+k, start_offset[3]+z]
                 for i, offset in enumerate(offsets):
                     junctions[i].set_offset(offset)
 
